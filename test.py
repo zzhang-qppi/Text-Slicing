@@ -1,2 +1,2 @@
-file = open("1.txt","w")
-print(type(file))
+a = '0'
+print(a[0:-1])
