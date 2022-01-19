@@ -1,6 +1,10 @@
-import docx
+# -*- coding: utf-8 -*-
 
-def __write_in_txt(word_path, txt_path):
+import docx
+import matplotlib.pyplot as plt
+import numpy as np
+
+def write_in_txt(word_path, txt_path):
 #    for lines in word_document:
 #        if lines.text != "附录1 ":
 #            lines.clear()
@@ -13,19 +17,33 @@ def __write_in_txt(word_path, txt_path):
         txt.write(lines.text+"\n")
 
 def data_slicing(word_path, txt_path):
-    __write_in_txt(word_path, txt_path)
+    write_in_txt(word_path, txt_path)
     txt = open(txt_path, mode="r")
-    totaldict = {'}f ':[[],[]], '}c ':[[],[]]}
+    totaldict = {'}f':[[],[]], '}c':[[],[]]}
     for i in txt.readlines():
         i = i.strip('\n')
+        i_spl = i.split(' ')
         try:
-            a = i[3:5]
-            b = i[6:-1]
-            totaldict[i[:3]][0].append(a)
-            totaldict[i[:3]][1].append(b)
+            totaldict[i_spl[0]][0].append(int(i_spl[1]))
+            totaldict[i_spl[0]][1].append(float(i_spl[2]))
         except KeyError:
             None
-    print(totaldict)
+    for keys in totaldict:
+        totaldict[keys] = np.asarray(totaldict[keys])
+    return totaldict
+
+def data_graphing(word_path, txt_path):
+    data = data_slicing(word_path, txt_path)
+    fig = plt.figure()
+    fig, axs = plt.subplots(1, len(data), layout='constrained')
+    for i in range(0, len(data)):
+        x_data = data[list(data.keys())[i]][0]
+        y_data = data[list(data.keys())[i]][1]
+        axs[i].scatter(x_data, y_data)
+        axs[i].set_title(list(data.keys())[i])
+    return fig
 
 if __name__ == "__main__":
-    data_slicing("project.docx","text.txt")
+    fig = data_graphing("project.docx","text.txt")
+    plt.savefig('scatter_plot.jpeg')
+    plt.show()
